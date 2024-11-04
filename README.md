@@ -27,11 +27,14 @@ go mod vendor -v
 ### run necessary service container
 
 ```bash
+cp compose.example.yaml compose.yaml
 docker-compose up -d
 ```
 
-## 1. RUN using Build.sh
-
+## 1. RUN
+```bash
+air
+```
 ### make build file executable
 
 ```bash
