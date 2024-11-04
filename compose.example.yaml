@@ -1,0 +1,28 @@
+services:
+  mysql:
+    container_name: master_moshai_mysql
+    image: mysql:8.0.32
+    restart: always
+    environment:
+      MYSQL_DATABASE: bootstrap
+      MYSQL_USER: webapp
+      MYSQL_PASSWORD: "secret"
+      MYSQL_ROOT_PASSWORD: "secret"
+    ports:
+      - "3307:3306"
+    expose:
+      - "3306"
+    volumes:
+      - "~/backup/db/mysql/example-go:/var/lib/mysql"
+
+  redis:
+    container_name: master_moshai_redis
+    image: redis:alpine
+    ports:
+      - "6379:6379"
+
+  consul:
+    container_name: master_moshai_consul
+    image: hashicorp/consul:latest  # https://github.com/hashicorp/consul/issues/17973
+    ports:
+      - "8500:8500"

@@ -1,0 +1,43 @@
+app:
+  env: development
+  verbose: true
+  http_port: 8088
+  read_timeout: 30
+  write_timeout: 30
+  idle_timeout: 30
+  http_timeout: 15
+  pagination_page_size: 20
+
+database:
+  host: 127.0.0.1
+  port: 3306
+  name: master_moshai
+  username: webapp
+  password: secret
+  options:
+    sslmode:
+      - disable
+  max_idle_connection: 2
+  max_open_connection: 2
+  max_connection_lifetime: 300
+
+redis:
+  host: 127.0.0.1
+  port: 6379
+  db: 0
+  password: ""
+  default_ttl: 3600
+  prefix: mm_
+
+jwt:
+  secret_key: strong_secret
+  expiration_duration_in_hours: 1  # 1 day
+
+cdn:
+  host: "http://docker.for.mac.localhost:8088"
+  token: token1
+  directory: "example-go/"
+  timeout: 5  # in seconds
+
+sentry:
+  dsn: "https://7297fb87b4714401b628d6e89d6aeb30@sentry.io/1352602"
