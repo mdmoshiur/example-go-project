@@ -1,6 +1,6 @@
 services:
   mysql:
-    container_name: master_moshai_mysql
+    container_name: mysql
     image: mysql:8.0.32
     restart: always
     environment:
@@ -16,13 +16,7 @@ services:
       - "~/backup/db/mysql/example-go:/var/lib/mysql"
 
   redis:
-    container_name: master_moshai_redis
+    container_name: redis
     image: redis:alpine
     ports:
       - "6379:6379"
-
-  consul:
-    container_name: master_moshai_consul
-    image: hashicorp/consul:latest  # https://github.com/hashicorp/consul/issues/17973
-    ports:
-      - "8500:8500"

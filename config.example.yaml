@@ -11,7 +11,7 @@ app:
 database:
   host: 127.0.0.1
   port: 3306
-  name: master_moshai
+  name: database_name
   username: webapp
   password: secret
   options:
