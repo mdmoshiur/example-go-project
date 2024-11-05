@@ -24,11 +24,6 @@ func New(db *gorm.DB) domain.UserRepository {
 	}
 }
 
-// BeginTransaction creates new database transaction
-func (ur *UserRepo) BeginTransaction(ctx context.Context) *gorm.DB {
-	return ur.DB.WithContext(ctx).Begin()
-}
-
 // Store inserts a new user to database
 func (ur *UserRepo) Store(ctx context.Context, user *domain.User) error {
 	if err := ur.DB.WithContext(ctx).Create(user).Error; err != nil {

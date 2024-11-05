@@ -83,7 +83,6 @@ type (
 
 // UserRepository represents User's repository contract
 type UserRepository interface {
-	BeginTransaction(ctx context.Context) *gorm.DB
 	FetchUserByEmail(ctx context.Context, email string) (*User, error)
 	Store(ctx context.Context, user *User) error
 	Store1(tx *gorm.DB, user *User) error
