@@ -10,6 +10,7 @@ func RegisterRoutes(r *chi.Mux, h *Handler) {
 	r.Mount("/api", apiRouter)
 	// add middleware to api sub router
 	apiRouter.Use(middleware.Auth)
+	apiRouter.Use(middleware.Gzip)
 
 	r.Post("/api/v1/login", h.UserHandler.Login)
 	r.Post("/api/v1/users", h.UserHandler.StoreOrUpdate)
