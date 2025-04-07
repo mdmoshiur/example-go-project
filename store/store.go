@@ -9,24 +9,24 @@ import (
 	userrepo "github.com/mdmoshiur/example-go/user/repository"
 )
 
-type Datastore interface {
-	Atomic(ctx context.Context, fn func(ds Datastore) error) error
+type Store interface {
+	Atomic(ctx context.Context, fn func(ds Store) error) error
 	UserRepository() domain.UserRepository
 }
 
 type DataStore struct {
 	db       *gorm.DB
-	UserRepo domain.UserRepository
+	userRepo domain.UserRepository
 }
 
-func New(db *gorm.DB) Datastore {
+func New(db *gorm.DB) Store {
 	return &DataStore{
 		db:       db,
-		UserRepo: userrepo.New(db),
+		userRepo: userrepo.New(db),
 	}
 }
 
-func (s *DataStore) Atomic(ctx context.Context, fn func(ds Datastore) error) (err error) {
+func (s *DataStore) Atomic(ctx context.Context, fn func(ds Store) error) (err error) {
 	tx := s.db.WithContext(ctx).Begin()
 
 	defer func() {
@@ -53,5 +53,5 @@ func (s *DataStore) Atomic(ctx context.Context, fn func(ds Datastore) error) (er
 }
 
 func (s *DataStore) UserRepository() domain.UserRepository {
-	return s.UserRepo
+	return s.userRepo
 }

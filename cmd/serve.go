@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"net/http"
 	"os"
@@ -66,7 +67,7 @@ func serve(cmd *cobra.Command, args []string) {
 	// build and run http server
 	srv := buildHTTP(cmd, args)
 	go func(sr *http.Server) {
-		if err := sr.ListenAndServe(); err != http.ErrServerClosed {
+		if err := sr.ListenAndServe(); !errors.Is(err, http.ErrServerClosed) {
 			logger.Fatal(err)
 		}
 	}(srv)
@@ -76,7 +77,7 @@ func serve(cmd *cobra.Command, args []string) {
 	ctx, cancel := context.WithTimeout(context.Background(), serverShutDownContextDeadline*time.Second)
 	defer cancel()
 
-	if err := srv.Shutdown(ctx); err != http.ErrServerClosed {
+	if err := srv.Shutdown(ctx); !errors.Is(err, http.ErrServerClosed) {
 		logger.Fatal(err)
 	}
 	logger.Info("Server shutdown successful!")
@@ -96,9 +97,11 @@ func buildHTTP(cmd *cobra.Command, args []string) *http.Server {
 	}))
 
 	// middlewares
-	r.Use(chimiddleware.Logger)
-	r.Use(chimiddleware.Recoverer)
-	r.Use(chimiddleware.Heartbeat("/"))
+	r.Use(
+		chimiddleware.Logger,
+		chimiddleware.Recoverer,
+		chimiddleware.Heartbeat("/"),
+	)
 
 	cfg := config.App()
 	db := conn.DefaultDB()

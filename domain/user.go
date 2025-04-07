@@ -4,8 +4,6 @@ import (
 	"context"
 	"errors"
 	"time"
-
-	"gorm.io/gorm"
 )
 
 // available User errors
@@ -85,7 +83,6 @@ type (
 type UserRepository interface {
 	FetchUserByEmail(ctx context.Context, email string) (*User, error)
 	Store(ctx context.Context, user *User) error
-	Store1(tx *gorm.DB, user *User) error
 	Update(ctx context.Context, user *User) error
 	StoreAuthToken(ctx context.Context, authToken *AuthToken) error
 	RevokeAuthToken(ctx context.Context, tokenID string) error

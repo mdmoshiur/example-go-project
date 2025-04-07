@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/go-sql-driver/mysql"
 	"github.com/jackc/pgx/v5/pgconn"
 	"github.com/mdmoshiur/example-go/domain"
 	"gorm.io/gorm"
@@ -31,23 +30,7 @@ func (ur *UserRepo) Store(ctx context.Context, user *domain.User) error {
 		if errors.As(err, &pgErr) && pgErr.Code == "23505" {
 			if strings.Contains(pgErr.Message, "email") {
 				return domain.ErrUserDuplicateEmail
-			}
-		}
-
-		return fmt.Errorf("repository:user: user create: %w", err)
-	}
-
-	return nil
-}
-
-// Store1 inserts a new user to database
-func (ur *UserRepo) Store1(tx *gorm.DB, user *domain.User) error {
-	if err := tx.WithContext(context.Background()).Create(user).Error; err != nil {
-		var mysqlErr *mysql.MySQLError
-		if errors.As(err, &mysqlErr) && mysqlErr.Number == 1062 {
-			if strings.Contains(mysqlErr.Message, "email") {
-				return domain.ErrUserDuplicateEmail
-			} else if strings.Contains(mysqlErr.Message, "phone") {
+			} else if strings.Contains(pgErr.Message, "phone") {
 				return domain.ErrUserDuplicatePhone
 			}
 		}
@@ -64,16 +47,20 @@ func (ur *UserRepo) Update(ctx context.Context, user *domain.User) error {
 		Where("id = ?", user.ID)
 
 	if err := q.Omit("id").Updates(user).Error; err != nil {
-		var mysqlErr *mysql.MySQLError
-		if errors.As(err, &mysqlErr) && mysqlErr.Number == 1062 {
-			if strings.Contains(mysqlErr.Message, "email") {
+		var pgErr *pgconn.PgError
+		if errors.As(err, &pgErr) && pgErr.Code == "23505" {
+			if strings.Contains(pgErr.Message, "email") {
 				return domain.ErrUserDuplicateEmail
-			} else if strings.Contains(mysqlErr.Message, "phone") {
+			} else if strings.Contains(pgErr.Message, "phone") {
 				return domain.ErrUserDuplicatePhone
 			}
 		}
 
 		return fmt.Errorf("repository:user: user update: %w", err)
+	}
+
+	if q.RowsAffected == 0 {
+		return domain.ErrUserNotFound
 	}
 
 	return nil
@@ -124,7 +111,7 @@ func (ur *UserRepo) FetchUserByEmail(ctx context.Context, email string) (*domain
 		Where("users.email = ?", email)
 
 	if err := q.Take(&user).Error; err != nil {
-		if err == gorm.ErrRecordNotFound {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return nil, domain.ErrUserNotFound
 		}
 		return nil, fmt.Errorf("repository:user:fetch user: %w", err)

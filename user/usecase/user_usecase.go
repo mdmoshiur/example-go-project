@@ -14,12 +14,12 @@ import (
 
 // UserUseCase represents the user usecase
 type UserUseCase struct {
-	Store    store.Datastore
+	Store    store.Store
 	CacheSvc cache.Cacher
 }
 
 // New return user usecase implementation
-func New(s store.Datastore, cs cache.Cacher) domain.UserUseCase {
+func New(s store.Store, cs cache.Cacher) domain.UserUseCase {
 	return &UserUseCase{
 		Store:    s,
 		CacheSvc: cs,
@@ -64,18 +64,8 @@ func (u *UserUseCase) StoreOrUpdate(ctx context.Context, user *domain.User) erro
 	}
 
 	// create user
-
-	atomicCallback := func(ds store.Datastore) error {
+	atomicCallback := func(ds store.Store) error {
 		if err := ds.UserRepository().Store(ctx, user); err != nil {
-			return err
-		}
-
-		secondUser := domain.User{
-			Name:     user.Name,
-			Email:    user.Email,
-			Password: user.Password,
-		}
-		if err := ds.UserRepository().Store(ctx, &secondUser); err != nil {
 			return err
 		}
 
