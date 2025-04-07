@@ -25,14 +25,13 @@ var (
 func init() {
 	cobra.OnInitialize(initConfig)
 	logger.DefaultLogger()
-	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "config.yaml", "config file")
+	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "config", "config file")
 	rootCmd.PersistentFlags().BoolVarP(&prettyPrintLog, "pretty", "p", false, "pretty print verbose/logger")
 	rootCmd.PersistentFlags().BoolVarP(&verbose, "verbose", "v", false, "verbose output")
 
 	// set the value of viper config
-	err := viper.BindPFlag("verbose", rootCmd.PersistentFlags().Lookup("verbose"))
-	if err != nil {
-		return
+	if err := viper.BindPFlag("verbose", rootCmd.PersistentFlags().Lookup("verbose")); err != nil {
+		panic(err)
 	}
 
 	// add migration rootCmd

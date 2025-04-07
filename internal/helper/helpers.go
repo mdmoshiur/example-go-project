@@ -38,6 +38,6 @@ func decode[T any](r *http.Request) (T, error) {
 	if err := json.NewDecoder(r.Body).Decode(&v); err != nil {
 		return v, err
 	}
-	
+
 	return v, nil
 }

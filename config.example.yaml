@@ -27,7 +27,7 @@ redis:
   db: 0
   password: ""
   default_ttl: 3600
-  prefix: mm_
+  prefix: example_go_
 
 jwt:
   secret_key: strong_secret

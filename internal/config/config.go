@@ -1,60 +1,59 @@
 package config
 
 import (
-	"github.com/davecgh/go-spew/spew"
-	"github.com/spf13/viper"
+	"log"
 
+	"github.com/spf13/viper"
 	_ "github.com/spf13/viper/remote"
 )
 
-// Init load configurations from config.yaml file
-func Init(cfgFile string) error {
-	spew.Dump(cfgFile)
-
-	// local config file read
-	viper.SetConfigName("config") // name of config file (without extension)
-	if cfgFile != "" {
-		viper.SetConfigName(cfgFile)
-	}
-
-	viper.SetConfigType("yaml")                  // REQUIRED if the config file does not have the extension in the name
-	viper.AddConfigPath(".")                     // optionally look for config in the working directory
-	if err := viper.ReadInConfig(); err != nil { // Find and read the config file
+// Init load configurations from specified config file.
+func Init(configFile string) error {
+	viper.SetEnvPrefix("example_go")
+	if err := viper.BindEnv("env"); err != nil {
 		return err
 	}
 
-	// remote config file read
+	env := viper.GetString("env")
+	if env == "" {
+		log.Fatal("environment variable 'env' is missing")
+	}
 
-	//viper.SetEnvPrefix("candy_recruiter")
-	//if err := viper.BindEnv("env"); err != nil {
-	//	return err
-	//}
-	//
-	//if err := viper.BindEnv("consul_url"); err != nil {
-	//	return err
-	//}
-	//if err := viper.BindEnv("consul_path"); err != nil {
-	//	return err
-	//}
-	//
-	//consulURL := viper.GetString("consul_url")
-	//consulPath := viper.GetString("consul_path")
-	//if consulURL == "" {
-	//	return errors.New("CONSUL_URL is missing")
-	//}
-	//if consulPath == "" {
-	//	return errors.New("CONSUL_PATH is missing")
-	//}
-	//
-	//if err := viper.AddRemoteProvider("consul", consulURL, consulPath); err != nil {
-	//	return err
-	//}
-	//
-	//viper.SetConfigType("yaml")
-	//
-	//if err := viper.ReadRemoteConfig(); err != nil {
-	//	return fmt.Errorf(`%s named "%s"`, err.Error(), consulPath)
-	//}
+	if env == EnvDevelopment { // local config file read
+		viper.SetConfigName(configFile) // name of config file (without extension)
+
+		viper.SetConfigType("yaml") // REQUIRED if the config file does not have the extension in the name
+		viper.AddConfigPath(".")    // optionally look for config in the working directory
+
+		if err := viper.ReadInConfig(); err != nil { // Find and read the config file
+			log.Fatalf("Error reading config file, %s", err.Error())
+		}
+	} else { // remote config file read
+		if err := viper.BindEnv("consul_url"); err != nil {
+			return err
+		}
+		if err := viper.BindEnv("consul_path"); err != nil {
+			return err
+		}
+
+		consulURL := viper.GetString("consul_url")
+		if consulURL == "" {
+			log.Fatal("CONSUL_URL missing")
+		}
+
+		consulPath := viper.GetString("consul_path")
+		if consulPath == "" {
+			log.Fatal("CONSUL_PATH missing")
+		}
+
+		_ = viper.AddRemoteProvider("consul", consulURL, consulPath)
+		viper.SetConfigType("yaml")
+
+		err := viper.ReadRemoteConfig()
+		if err != nil {
+			log.Fatalf("%s named \"%s\"", err.Error(), consulPath)
+		}
+	}
 
 	initConfig()
 	return nil
