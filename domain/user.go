@@ -4,6 +4,8 @@ import (
 	"context"
 	"errors"
 	"time"
+
+	"github.com/mdmoshiur/example-go/domain/dto"
 )
 
 // available User errors
@@ -84,6 +86,7 @@ type UserRepository interface {
 	FetchUserByEmail(ctx context.Context, email string) (*User, error)
 	Store(ctx context.Context, user *User) error
 	Update(ctx context.Context, user *User) error
+	FetchDetails(ctx context.Context, userID uint32) (*dto.UserDetails, error)
 	StoreAuthToken(ctx context.Context, authToken *AuthToken) error
 	RevokeAuthToken(ctx context.Context, tokenID string) error
 	RevokeAllAuthToken(ctx context.Context, userID uint32) error
@@ -94,6 +97,7 @@ type UserUseCase interface {
 	Login(ctx context.Context, ctr *LoginCriteria) (string, error)
 	Logout(ctx context.Context, token string) error
 	StoreOrUpdate(ctx context.Context, user *User) error
+	Details(ctx context.Context, userID uint32) (*dto.UserDetails, error)
 }
 
 type UserTransformer interface{}

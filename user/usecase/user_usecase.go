@@ -4,7 +4,9 @@ import (
 	"context"
 	"errors"
 	"fmt"
+
 	"github.com/mdmoshiur/example-go/domain"
+	"github.com/mdmoshiur/example-go/domain/dto"
 	"github.com/mdmoshiur/example-go/internal/cache"
 	"github.com/mdmoshiur/example-go/internal/jwtauth"
 	"github.com/mdmoshiur/example-go/internal/logger"
@@ -24,6 +26,16 @@ func New(s store.Store, cs cache.Cacher) domain.UserUseCase {
 		Store:    s,
 		CacheSvc: cs,
 	}
+}
+
+// Details fetch user details
+func (u *UserUseCase) Details(ctx context.Context, userID uint32) (*dto.UserDetails, error) {
+	details, err := u.Store.UserRepository().FetchDetails(ctx, userID)
+	if err != nil {
+		logger.Error(err)
+		return nil, err
+	}
+	return details, nil
 }
 
 // StoreOrUpdate stores/updates user in database

@@ -8,6 +8,7 @@ import (
 
 	"github.com/jackc/pgx/v5/pgconn"
 	"github.com/mdmoshiur/example-go/domain"
+	"github.com/mdmoshiur/example-go/domain/dto"
 	"gorm.io/gorm"
 )
 
@@ -118,4 +119,25 @@ func (ur *UserRepo) FetchUserByEmail(ctx context.Context, email string) (*domain
 	}
 
 	return user, nil
+}
+
+func (ur *UserRepo) FetchDetails(ctx context.Context, userID uint32) (*dto.UserDetails, error) {
+	var details *dto.UserDetails
+	q := ur.DB.WithContext(ctx).Model(&domain.User{}).
+		Select(`
+			id,
+			name,
+			phone,
+			email
+ 		`).
+		Where("users.id = ?", userID)
+
+	if err := q.Take(&details).Error; err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return nil, domain.ErrUserNotFound
+		}
+		return nil, fmt.Errorf("repository:user:fetch user details: %w", err)
+	}
+
+	return details, nil
 }

@@ -8,6 +8,7 @@ import (
 
 	"github.com/go-chi/chi/v5"
 	"github.com/mdmoshiur/example-go/domain"
+	"github.com/mdmoshiur/example-go/internal/jwtauth"
 	"github.com/mdmoshiur/example-go/internal/logger"
 	"github.com/mdmoshiur/example-go/internal/responder"
 	"github.com/mdmoshiur/example-go/internal/validation"
@@ -169,5 +170,25 @@ func (u *UserHandler) Logout(w http.ResponseWriter, r *http.Request) {
 	(&responder.Response{
 		Status:  http.StatusOK,
 		Message: "user logged out successfully",
+	}).Render(w)
+}
+
+func (u *UserHandler) Details(w http.ResponseWriter, r *http.Request) {
+	user, err := jwtauth.ContextUser(r.Context())
+	if err != nil {
+		responder.InternalServerErr(w, err)
+		return
+	}
+
+	details, err := u.UserUseCase.Details(r.Context(), user.ID)
+	if err != nil {
+		responder.InternalServerErr(w, err)
+		return
+	}
+
+	(&responder.Response{
+		Status:  http.StatusOK,
+		Message: "user details",
+		Data:    details,
 	}).Render(w)
 }

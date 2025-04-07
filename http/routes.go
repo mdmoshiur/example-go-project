@@ -15,6 +15,7 @@ func RegisterRoutes(r *chi.Mux, h *Handler) {
 	r.Post("/api/v1/users", h.UserHandler.StoreOrUpdate)
 
 	apiRouter.Route("/v1/users", func(r chi.Router) {
+		r.Get("/me", h.UserHandler.Details)
 		r.Put("/{id}", h.UserHandler.StoreOrUpdate)
 		r.Post("/logout", h.UserHandler.Logout)
 	})

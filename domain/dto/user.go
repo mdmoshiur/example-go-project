@@ -3,17 +3,10 @@ package dto
 type (
 	// UserDetails ...
 	UserDetails struct {
-		ID         uint32                   `json:"id"`
-		Name       string                   `json:"name"`
-		Email      string                   `json:"email"`
-		Phone      *string                  `json:"phone"`
-		RoleID     *uint8                   `json:"role_id"`
-		RoleName   *string                  `json:"role_name"`
-		StatusID   *uint8                   `json:"status_id"`
-		StatusName string                   `json:"status_name"`
-		TopicsStr  string                   `json:"-"`
-		Topics     []map[string]interface{} `json:"topics"`
-		Stats      UserStats                `json:"stats" gorm:"-"`
+		ID    uint32  `json:"id"`
+		Name  string  `json:"name"`
+		Email string  `json:"email"`
+		Phone *string `json:"phone"`
 	}
 
 	// UserStats ...
