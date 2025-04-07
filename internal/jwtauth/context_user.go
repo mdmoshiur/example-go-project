@@ -5,7 +5,7 @@ import (
 	"errors"
 )
 
-const ContextAuthUser = "ctx_auth_user_"
+type ContextAuthUser struct{}
 
 type AuthUser struct {
 	ID    uint32 `json:"id"`
@@ -15,7 +15,7 @@ type AuthUser struct {
 
 // ContextUser returns context user information
 func ContextUser(ctx context.Context) (*AuthUser, error) {
-	ctxVal := ctx.Value(ContextAuthUser)
+	ctxVal := ctx.Value(ContextAuthUser{})
 	if ctxVal == nil {
 		return nil, errors.New("contextuser: failed to extract user info from request-context")
 	}

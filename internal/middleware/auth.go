@@ -49,7 +49,7 @@ func Auth(next http.Handler) http.Handler {
 			return
 		}
 
-		ctx := context.WithValue(r.Context(), jwtauth.ContextAuthUser, claims.User)
+		ctx := context.WithValue(r.Context(), jwtauth.ContextAuthUser{}, claims.User)
 		next.ServeHTTP(w, r.WithContext(ctx))
 	}
 
